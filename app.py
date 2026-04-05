@@ -22,15 +22,43 @@ lats = ds['latitude'].values
 lons = ds['longitude'].values
 annual_mean = scores.mean(axis=0)
 
+temp_clim = xr.open_dataset('data/processed/temp_climatology.nc', engine='netcdf4')
+precip_clim = xr.open_dataset('data/processed/precip_climatology.nc', engine='netcdf4')
+
 MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun',
                'Jul','Aug','Sep','Oct','Nov','Dec']
 
-def get_location_scores(lat, lon):
-    if lon < 0:
-        lon = lon + 360
+VEG_WEIGHTS = {
+    'reforestation': {'temp': 0.35, 'precip': 0.35, 'frost': 0.30},
+    'crops':         {'temp': 0.40, 'precip': 0.40, 'frost': 0.20},
+    'shrubs':        {'temp': 0.30, 'precip': 0.30, 'frost': 0.40},
+    'grassland':     {'temp': 0.33, 'precip': 0.34, 'frost': 0.33},
+}
+
+def get_location_scores_veg(lat, lon, veg_type):
+    lon_idx_val = lon + 360 if lon < 0 else lon
     lat_idx = np.argmin(np.abs(lats - lat))
-    lon_idx = np.argmin(np.abs(lons - lon))
-    return scores[:, lat_idx, lon_idx]
+    lon_idx = np.argmin(np.abs(lons - lon_idx_val))
+
+    t = temp_clim['t2m'].values[:, lat_idx, lon_idx]  # already Celsius
+    p = precip_clim['tp'].values[:, lat_idx, lon_idx] * 1000 * 30
+
+    w = VEG_WEIGHTS[veg_type]
+
+    ts = np.where(t < 0, 0,
+         np.where(t < 10, t/10*60,
+         np.where(t <= 25, 100,
+         np.where(t <= 35, (35-t)/10*100, 0))))
+
+    ps = np.where(p < 10, 0,
+         np.where(p < 50, p/50*80,
+         np.where(p <= 150, 100,
+         np.where(p <= 300, (300-p)/150*100, 20))))
+
+    fs = np.where(t < -5, 0,
+         np.where(t < 5, (t+5)/10*60, 100))
+
+    return w['temp']*ts + w['precip']*ps + w['frost']*fs
 
 def best_window(monthly_scores):
     best_month = int(np.argmax(monthly_scores))
@@ -49,10 +77,22 @@ app.layout = html.Div([
         dcc.Input(id='city-input', type='text',
                   placeholder='Enter a city (e.g. Toronto, Nairobi, Berlin...)',
                   style={'marginRight': '8px', 'width': '320px'}),
+        dcc.Dropdown(
+            id='veg-dropdown',
+            options=[
+                {'label': 'Reforestation', 'value': 'reforestation'},
+                {'label': 'Crops', 'value': 'crops'},
+                {'label': 'Native shrubs', 'value': 'shrubs'},
+                {'label': 'Grassland', 'value': 'grassland'},
+            ],
+            value='reforestation',
+            clearable=False,
+            style={'width': '200px', 'marginRight': '8px', 'display': 'inline-block'}
+        ),
         html.Button('Analyze', id='analyze-btn', n_clicks=0),
         html.Div(id='geocode-result',
                  style={'fontSize': '12px', 'color': '#888', 'marginTop': '6px'})
-    ], style={'marginBottom': '20px'}),
+    ], style={'marginBottom': '20px', 'display': 'flex', 'alignItems': 'center', 'flexWrap': 'wrap', 'gap': '8px'}),
 
     html.Div([
         html.Div([
@@ -130,8 +170,9 @@ def update_map(n_clicks, city):
     Output('metric-cards', 'children'),
     Input('analyze-btn', 'n_clicks'),
     State('city-input', 'value'),
+    State('veg-dropdown', 'value'),
 )
-def update_panel(n_clicks, city):
+def update_panel(n_clicks, city, veg_type):
     empty_fig = go.Figure()
     empty_fig.update_layout(
         paper_bgcolor='white', plot_bgcolor='white',
@@ -145,7 +186,7 @@ def update_panel(n_clicks, city):
     if not lat:
         return empty_fig, '', 'Location not found', ''
 
-    monthly = get_location_scores(float(lat), float(lon))
+    monthly = get_location_scores_veg(float(lat), float(lon), veg_type)
     best = best_window(monthly)
 
     colors = ['#1D9E75' if s >= 70 else '#FAC775' if s >= 40 else '#D85A30'
@@ -163,13 +204,26 @@ def update_panel(n_clicks, city):
         paper_bgcolor='white',
     )
 
+    veg_label = {
+        'reforestation': 'Reforestation',
+        'crops': 'Crops',
+        'shrubs': 'Native shrubs',
+        'grassland': 'Grassland'
+    }[veg_type]
+
     badge = html.Div([
         html.Span('Best window: ', style={'fontSize': '13px', 'color': '#666'}),
         html.Span(best, style={
             'fontSize': '13px', 'fontWeight': '500',
             'background': '#EAF3DE', 'color': '#27500A',
+            'padding': '3px 10px', 'borderRadius': '99px',
+            'marginRight': '8px'
+        }),
+        html.Span(veg_label, style={
+            'fontSize': '12px',
+            'background': '#E6F1FB', 'color': '#0C447C',
             'padding': '3px 10px', 'borderRadius': '99px'
-        })
+        }),
     ])
 
     label = f"Location: {address}"
