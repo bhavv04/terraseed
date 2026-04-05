@@ -125,7 +125,7 @@ The composite score is computed using a weighted scoring function applied across
 
 **Quick wins**
 
-- [ ] City name search using geopy instead of manual coordinates
+- [X] City name search using geopy instead of manual coordinates
 - [ ] Vegetation type dropdown with different score weights per plant type
 - [ ] Top 10 best locations globally for a selected month
 
