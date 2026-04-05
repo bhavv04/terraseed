@@ -2,7 +2,7 @@
 
 > Find the best time and place on Earth to plant greenery.
 
-TarraSeed is an interactive data science project that predicts optimal planting windows for any location on Earth using 30 years of ERA5 climate data. It combines temperature, precipitation, soil moisture, and frost risk into a single planting score — then surfaces the best months to plant through an interactive global dashboard.
+TarraSeed is an interactive data science project that predicts optimal planting windows for any location on Earth using 30 years of ERA5 climate data. It combines temperature, precipitation, soil moisture, and frost risk into a single planting score and surfaces the best months to plant through an interactive global dashboard.
 
 ![TarraSeed Dashboard](outputs/terraseed_dashboard.png)
 
@@ -10,7 +10,7 @@ TarraSeed is an interactive data science project that predicts optimal planting 
 
 ## What it does
 
-Every patch of land has a window each year where conditions align for vegetation to take hold. TarraSeed finds that window. Search any location, pick a vegetation type, and get a month-by-month planting score backed by three decades of satellite and reanalysis climate data.
+Every patch of land has a window each year where conditions align for vegetation to take hold. TarraSeed finds that window. Enter any coordinates, and get a month-by-month planting score backed by three decades of satellite and reanalysis climate data.
 
 ---
 
@@ -78,7 +78,7 @@ git clone https://github.com/bhavv04/terraseed.git
 cd terraseed
 
 # install dependencies
-pip install xarray rioxarray netcdf4 cdsapi plotly dash scikit-learn xgboost seaborn earthaccess rioxarray
+pip install xarray rioxarray netcdf4 cdsapi plotly dash scikit-learn xgboost seaborn earthaccess
 
 # set up CDS credentials (required for ERA5 download)
 # create ~/.cdsapirc with your Copernicus API key
@@ -103,23 +103,42 @@ Each location gets a monthly score from 0 to 100 based on four variables:
 
 | Variable | Weight | Why it matters |
 |---|---|---|
-| Temperature | 30% | Most vegetation needs 5-25°C to establish |
-| Rainfall | 30% | Consistent moisture is critical in early growth |
-| Soil moisture | 25% | Direct measure of water available to roots |
-| Frost risk | 15% | Late frost kills newly planted seedlings |
+| Temperature | 35% | Most vegetation needs 5-25°C to establish |
+| Rainfall | 35% | Consistent moisture is critical in early growth |
+| Frost risk | 30% | Late frost kills newly planted seedlings |
 
-The composite score is computed using a weighted Random Forest trained on coordinates of known successful reforestation projects globally.
+The composite score is computed using a weighted scoring function applied across the full global grid.
 
 ---
 
 ## Dashboard Features
 
-- Search any location by name or coordinates
-- Select vegetation type: reforestation, crops, native shrubs, or grassland
-- Global choropleth map colored by annual planting score
+- Enter any coordinates to get a planting score
+- Global heatmap colored by annual planting score
 - Month-by-month planting calendar for the selected location
-- Snapshot cards showing temperature, rainfall, soil moisture, and frost metrics
 - Best planting window highlighted automatically
+- Annual and peak score summary cards
+
+---
+
+## Roadmap
+
+**Quick wins**
+
+- [ ] City name search using geopy instead of manual coordinates
+- [ ] Vegetation type dropdown with different score weights per plant type
+- [ ] Top 10 best locations globally for a selected month
+
+**Medium effort**
+
+- [ ] Climate change comparison: 1990-2005 vs 2006-2020 score shift map
+- [ ] Seasonal animation showing green zones pulsing across the Earth month by month
+- [ ] Country/region summary on map click
+
+**Larger features**
+
+- [ ] Integrate NASA SMAP real soil moisture data into the scoring model
+- [ ] Species-specific recommendations based on GBIF habitat data
 
 ---
 
