@@ -2,7 +2,7 @@
 
 > Find the best time and place on Earth to plant greenery.
 
-TarraSeed is an interactive data science project that predicts optimal planting windows for any location on Earth using 30 years of ERA5 climate data. It combines temperature, precipitation, soil moisture, and frost risk into a single planting score and surfaces the best months to plant through an interactive global dashboard.
+Terraseed is an interactive data science project that predicts optimal planting windows for any location on Earth using 30 years of ERA5 climate data. It combines temperature, precipitation, soil moisture, and frost risk into a single planting score and surfaces the best months to plant through an interactive global dashboard.
 
 ![TarraSeed Dashboard](outputs/terraseed_dashboard.png)
 
