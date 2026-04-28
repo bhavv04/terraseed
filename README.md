@@ -4,13 +4,13 @@
 
 Terraseed is an interactive data science project that predicts optimal planting windows for any location on Earth using 30 years of ERA5 climate data. It combines temperature, precipitation, soil moisture, and frost risk into a single planting score and surfaces the best months to plant through an interactive global dashboard.
 
-![TarraSeed Dashboard](outputs/terraseed_dashboard.png)
+![Terraseed Dashboard](outputs/terraseed_dashboard.png)
 
 ---
 
 ## What it does
 
-Every patch of land has a window each year where conditions align for vegetation to take hold. TarraSeed finds that window. Enter any coordinates, and get a month-by-month planting score backed by three decades of satellite and reanalysis climate data.
+Every patch of land has a window each year where conditions align for vegetation to take hold. Terraseed finds that window. Enter any coordinates, and get a month-by-month planting score backed by three decades of satellite and reanalysis climate data.
 
 ---
 
@@ -127,7 +127,6 @@ The composite score is computed using a weighted scoring function applied across
 
 - [X] City name search using geopy instead of manual coordinates
 - [X] Vegetation type dropdown with different score weights per plant type
-- [ ] Top 10 best locations globally for a selected month
 
 **Medium effort**
 
