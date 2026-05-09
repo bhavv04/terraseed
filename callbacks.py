@@ -6,6 +6,8 @@ from geopy.geocoders import Nominatim
 
 geolocator = Nominatim(user_agent="terraseed")
 
+soil_clim = xr.open_dataset('data/processed/soil_climatology.nc', engine='netcdf4')
+
 ds = xr.open_dataset('data/processed/planting_scores.nc')
 scores = ds['planting_score'].values
 lats = ds['latitude'].values
@@ -43,19 +45,32 @@ def geocode_city(city_name):
         return None, None, None
 
 
+VEG_WEIGHTS = {
+    'reforestation': {'temp': 0.30, 'precip': 0.30, 'frost': 0.20, 'soil': 0.20},
+    'crops':         {'temp': 0.30, 'precip': 0.25, 'frost': 0.15, 'soil': 0.30},
+    'shrubs':        {'temp': 0.25, 'precip': 0.25, 'frost': 0.25, 'soil': 0.25},
+    'grassland':     {'temp': 0.28, 'precip': 0.28, 'frost': 0.22, 'soil': 0.22},
+}
+
 def get_location_scores_veg(lat, lon, veg_type):
     lon_idx_val = lon + 360 if lon < 0 else lon
     lat_idx = np.argmin(np.abs(lats - lat))
     lon_idx = np.argmin(np.abs(lons - lon_idx_val))
+
     t = temp_clim['t2m'].values[:, lat_idx, lon_idx]
     p = precip_clim['tp'].values[:, lat_idx, lon_idx] * 1000 * 30
+    s = soil_clim['swvl1'].values[:, lat_idx, lon_idx]
     w = VEG_WEIGHTS[veg_type]
+
     ts = np.where(t < 0, 0, np.where(t < 10, t/10*60,
          np.where(t <= 25, 100, np.where(t <= 35, (35-t)/10*100, 0))))
     ps = np.where(p < 10, 0, np.where(p < 50, p/50*80,
          np.where(p <= 150, 100, np.where(p <= 300, (300-p)/150*100, 20))))
     fs = np.where(t < -5, 0, np.where(t < 5, (t+5)/10*60, 100))
-    return w['temp']*ts + w['precip']*ps + w['frost']*fs
+    ss = np.where(s < 0.05, 0, np.where(s < 0.2, s/0.2*70,
+         np.where(s <= 0.4, 100, np.where(s <= 0.6, (0.6-s)/0.2*80, 20))))
+
+    return w['temp']*ts + w['precip']*ps + w['frost']*fs + w['soil']*ss
 
 
 def best_window(monthly_scores):

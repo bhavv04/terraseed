@@ -103,9 +103,10 @@ Each location gets a monthly score from 0 to 100 based on four variables:
 
 | Variable | Weight | Why it matters |
 |---|---|---|
-| Temperature | 35% | Most vegetation needs 5-25°C to establish |
-| Rainfall | 35% | Consistent moisture is critical in early growth |
-| Frost risk | 30% | Late frost kills newly planted seedlings |
+| Temperature | 30% | Most vegetation needs 5-25°C to establish |
+| Rainfall | 30% | Consistent moisture is critical in early growth |
+| Soil moisture | 20% | Direct measure of water available to roots |
+| Frost risk | 20% | Late frost kills newly planted seedlings |
 
 The composite score is computed using a weighted scoring function applied across the full global grid.
 
@@ -136,7 +137,7 @@ The composite score is computed using a weighted scoring function applied across
 
 **Larger features**
 
-- [ ] Integrate NASA SMAP real soil moisture data into the scoring model
+- [x] Integrate NASA SMAP real soil moisture data into the scoring model
 - [ ] Species-specific recommendations based on GBIF habitat data
 
 ---
