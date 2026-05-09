@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terraseed — Global Planting Intelligence</title>
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+  <nav>
+    <div class="nav-brand">
+      <div class="nav-logo">🌿</div>
+      <span class="nav-title">Terraseed</span>
+    </div>
+    <span class="nav-tag">ERA5 · 30 years · Global coverage</span>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-left">
+      <div class="hero-eyebrow">Global planting intelligence</div>
+      <h1 class="hero-title">Find the best time to plant, <em>anywhere</em> on Earth.</h1>
+      <p class="hero-sub">Terraseed scores every location across 12 months using temperature, precipitation, soil moisture, and frost risk from 30 years of ECMWF ERA5 climate data.</p>
+
+      <div class="search-wrap">
+        <div class="search-label">Search a location</div>
+        <div class="search-row">
+          <input class="search-input" id="city-input" type="text" placeholder="City name or region..." />
+          <button class="search-btn" onclick="analyze()">Analyze</button>
+        </div>
+        <div class="search-label" style="margin-bottom:8px;">Vegetation type</div>
+        <div class="veg-row">
+          <button class="veg-chip active" data-veg="reforestation" onclick="selectVeg(this)">Reforestation</button>
+          <button class="veg-chip" data-veg="crops" onclick="selectVeg(this)">Crops</button>
+          <button class="veg-chip" data-veg="shrubs" onclick="selectVeg(this)">Native shrubs</button>
+          <button class="veg-chip" data-veg="grassland" onclick="selectVeg(this)">Grassland</button>
+        </div>
+        <div class="geocode-result" id="geocode-result"></div>
+      </div>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat-card">
+        <div class="stat-num">180×360</div>
+        <div class="stat-label">Global grid resolution</div>
+      </div>
+      <div class="stat-card accent">
+        <div class="stat-num">30 yrs</div>
+        <div class="stat-label">ERA5 climate data, 1990–2020</div>
+      </div>
+      <div class="stat-card accent2">
+        <div class="stat-num">4</div>
+        <div class="stat-label">Climate variables scored</div>
+      </div>
+      <div class="stat-card accent3">
+        <div class="stat-num">12</div>
+        <div class="stat-label">Monthly windows per location</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="map-section">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Global planting score</div>
+          <div class="section-sub">Annual mean — warmer tones indicate better conditions year-round</div>
+        </div>
+      </div>
+      <div class="map-card">
+        <div id="world-map" style="height:420px;"></div>
+      </div>
+    </div>
+
+    <div class="loading" id="loading">Analyzing climate data...</div>
+
+    <div class="results-grid results-hidden" id="results">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title" id="chart-title">Monthly planting score</div>
+            <div class="chart-sub" id="chart-sub">12-month planting calendar</div>
+          </div>
+          <div class="best-badge" id="best-badge"></div>
+        </div>
+        <div id="polar-chart" style="height:360px;"></div>
+      </div>
+
+      <div class="right-panel">
+        <div class="location-card">
+          <div class="location-name" id="location-name">—</div>
+          <div class="location-coords" id="location-coords"></div>
+          <div class="metric-row">
+            <div class="metric-item">
+              <div class="metric-label">Annual score</div>
+              <div class="metric-value" id="annual-score">—</div>
+              <div class="metric-sub">out of 100</div>
+            </div>
+            <div class="metric-item">
+              <div class="metric-label">Peak score</div>
+              <div class="metric-value" id="peak-score">—</div>
+              <div class="metric-sub">out of 100</div>
+            </div>
+            <div class="metric-item">
+              <div class="metric-label">Best month</div>
+              <div class="metric-value" id="best-month" style="font-size:20px;">—</div>
+              <div class="metric-sub">to plant</div>
+            </div>
+            <div class="metric-item">
+              <div class="metric-label">Good months</div>
+              <div class="metric-value" id="good-months">—</div>
+              <div class="metric-sub">score ≥ 70</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="veg-info-card">
+          <div class="veg-info-label">Scoring weights</div>
+          <div class="veg-info-name" id="veg-name">Reforestation</div>
+          <div class="veg-weights" id="veg-weights"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-brand">TarraSeed</div>
+    <div class="footer-meta">
+      Data: ECMWF ERA5 Land Monthly Means · Copernicus Climate Data Store<br>
+      Built by Bhav · Toronto Metropolitan University · github.com/bhavv04/terraseed
+    </div>
+  </footer>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>
